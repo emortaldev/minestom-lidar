@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # A non-shallow repository clone is required
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
@@ -23,6 +25,14 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Run PackSquash
+        uses: ComunidadAylas/PackSquash-action@v4.0.2
+        with:
+          packsquash_version: latest
+          options: |
+            pack_directory = 'resourcepack'
+            zip_spec_conformance_level = 'high'
+            output_file_path = '/tmp/pack.zip'
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -30,5 +40,6 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            LICENSE.md
+            LICENSE
             build/libs/*.jar
+            /tmp/pack.zip
